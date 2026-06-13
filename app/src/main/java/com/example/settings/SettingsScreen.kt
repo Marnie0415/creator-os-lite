@@ -79,6 +79,79 @@ fun SettingsScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // Import state (moved to top-level @Composable scope for Kotlin 2.2.10 compiler plugin)
+    val db = com.example.data.AppDatabase.getDatabase(context)
+    val importStep = remember { mutableIntStateOf(0) }
+    var pendingClientsUri by remember { mutableStateOf<Uri?>(null) }
+    var pendingTimelinesUri by remember { mutableStateOf<Uri?>(null) }
+    var pendingProjectsUri by remember { mutableStateOf<Uri?>(null) }
+    var pendingInvoicesUri by remember { mutableStateOf<Uri?>(null) }
+    var importStepLabel by remember { mutableStateOf(stringResource(R.string.import_button)) }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) {
+            importStep.value = 0
+            pendingClientsUri = null
+            pendingTimelinesUri = null
+            pendingProjectsUri = null
+            pendingInvoicesUri = null
+            importStepLabel = stringResource(R.string.import_button)
+            return@rememberLauncherForActivityResult
+        }
+        when (importStep.value) {
+            0 -> {
+                pendingClientsUri = uri
+                importStep.value = 1
+                importStepLabel = "Step 2/4: Select Timelines CSV"
+            }
+            1 -> {
+                pendingTimelinesUri = uri
+                importStep.value = 2
+                importStepLabel = "Step 3/4: Select Projects CSV"
+            }
+            2 -> {
+                pendingProjectsUri = uri
+                importStep.value = 3
+                importStepLabel = "Step 4/4: Select Invoices CSV"
+            }
+            3 -> {
+                pendingInvoicesUri = uri
+                // All 4 files selected — run import
+                coroutineScope.launch {
+                    try {
+                        val result = DataImporter.importAll(
+                            context = context,
+                            clientsUri = pendingClientsUri,
+                            timelinesUri = uri,
+                            projectsUri = pendingProjectsUri,
+                            invoicesUri = pendingInvoicesUri,
+                            clientDao = db.clientDao(),
+                            projectDao = db.projectDao(),
+                            invoiceDao = db.invoiceDao()
+                        )
+                        exportSnackbarMessage = context.getString(
+                            R.string.import_success,
+                            result.clientsImported,
+                            result.projectsImported,
+                            result.invoicesImported
+                        )
+                    } catch (e: Exception) {
+                        exportSnackbarMessage = context.getString(R.string.import_error)
+                    } finally {
+                        importStep.value = 0
+                        pendingClientsUri = null
+                        pendingTimelinesUri = null
+                        pendingProjectsUri = null
+                        pendingInvoicesUri = null
+                        importStepLabel = stringResource(R.string.import_button)
+                    }
+                }
+            }
+        }
+    }
+
     // Show snackbar when export status changes
     LaunchedEffect(exportSnackbarMessage) {
         exportSnackbarMessage?.let {
@@ -642,7 +715,6 @@ fun SettingsScreen(
 
             // ---- Data Import Card ----
             if (clientRepository != null && projectRepository != null && invoiceRepository != null) {
-                val daoContext = context
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
@@ -673,80 +745,6 @@ fun SettingsScreen(
                             lineHeight = 16.sp
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-
-                        // Sequential import: pick 4 CSV files one by one
-                        val db = com.example.data.AppDatabase.getDatabase(daoContext)
-
-                        val importStep = remember { mutableIntStateOf(0) }
-                        var pendingClientsUri by remember { mutableStateOf<Uri?>(null) }
-                        var pendingTimelinesUri by remember { mutableStateOf<Uri?>(null) }
-                        var pendingProjectsUri by remember { mutableStateOf<Uri?>(null) }
-                        var pendingInvoicesUri by remember { mutableStateOf<Uri?>(null) }
-                        var importStepLabel by remember { mutableStateOf(stringResource(R.string.import_button)) }
-
-                        val importLauncher = rememberLauncherForActivityResult(
-                            ActivityResultContracts.OpenDocument()
-                        ) { uri ->
-                            if (uri == null) {
-                                importStep.value = 0
-                                pendingClientsUri = null
-                                pendingTimelinesUri = null
-                                pendingProjectsUri = null
-                                pendingInvoicesUri = null
-                                importStepLabel = stringResource(R.string.import_button)
-                                return@rememberLauncherForActivityResult
-                            }
-                            when (importStep.value) {
-                                0 -> {
-                                    pendingClientsUri = uri
-                                    importStep.value = 1
-                                    importStepLabel = "Step 2/4: Select Timelines CSV"
-                                }
-                                1 -> {
-                                    pendingTimelinesUri = uri
-                                    importStep.value = 2
-                                    importStepLabel = "Step 3/4: Select Projects CSV"
-                                }
-                                2 -> {
-                                    pendingProjectsUri = uri
-                                    importStep.value = 3
-                                    importStepLabel = "Step 4/4: Select Invoices CSV"
-                                }
-                                3 -> {
-                                    pendingInvoicesUri = uri
-                                    // All 4 files selected — run import
-                                    coroutineScope.launch {
-                                        try {
-                                            val result = DataImporter.importAll(
-                                                context = daoContext,
-                                                clientsUri = pendingClientsUri,
-                                                timelinesUri = uri,
-                                                projectsUri = pendingProjectsUri,
-                                                invoicesUri = pendingInvoicesUri,
-                                                clientDao = db.clientDao(),
-                                                projectDao = db.projectDao(),
-                                                invoiceDao = db.invoiceDao()
-                                            )
-                                            exportSnackbarMessage = daoContext.getString(
-                                                R.string.import_success,
-                                                result.clientsImported,
-                                                result.projectsImported,
-                                                result.invoicesImported
-                                            )
-                                        } catch (e: Exception) {
-                                            exportSnackbarMessage = daoContext.getString(R.string.import_error)
-                                        } finally {
-                                            importStep.value = 0
-                                            pendingClientsUri = null
-                                            pendingTimelinesUri = null
-                                            pendingProjectsUri = null
-                                            pendingInvoicesUri = null
-                                            importStepLabel = stringResource(R.string.import_button)
-                                        }
-                                    }
-                                }
-                            }
-                        }
 
                         Button(
                             onClick = {

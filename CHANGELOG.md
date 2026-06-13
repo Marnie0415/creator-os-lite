@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.1] - 2026-06-14
+
+### Fixed
+- **Compose build error on GitHub Actions CI** — Moved `importLauncher` (`rememberLauncherForActivityResult`) and import state to top-level `@Composable` scope to fix Kotlin 2.2.10 compose compiler plugin composable context tracking errors
+
+## [1.4.0] - 2026-06-13
+
+### Added
+- New app icon
+- Splash screen
+- Improved UX
+- Sequential CSV import (4-file picker)
+
 ## [1.3.1] - 2026-06-13
 
 ### Fixed
