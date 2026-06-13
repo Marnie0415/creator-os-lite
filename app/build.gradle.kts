@@ -14,20 +14,33 @@ android {
     applicationId = "com.creatoros.lite"
     minSdk = 24
     targetSdk = 36
-    versionCode = 1
-    versionName = "1.0"
+    versionCode = 2
+    versionName = "1.3.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
-  // Signing config — users should create their own keystore for release builds.
-  // See: https://developer.android.com/studio/publish/app-signing
+  signingConfigs {
+    create("release") {
+      // For CI/debug builds, use the debug keystore.
+      // For production release, create your own keystore and reference it here.
+      keyAlias = "androiddebugkey"
+      keyPassword = "android"
+      storeFile = file(System.getProperty("user.home") + "/.android/debug.keystore")
+      storePassword = "android"
+    }
+  }
+
   buildTypes {
+    debug {
+      isDebuggable = true
+    }
     release {
       isCrunchPngs = false
       isMinifyEnabled = true
       isShrinkResources = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+      signingConfig = signingConfigs.named("release").get()
     }
   }
   compileOptions {

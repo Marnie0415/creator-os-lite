@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.3.0] - 2026-06-13
+
+### Fixed
+- **KSP Version** — Changed from non-existent `2.3.9` to `2.2.10-2.0.2` (matching Kotlin 2.2.10)
+- **Compose BOM** — Upgraded from `2024.12.01` to `2026.05.00` for Kotlin 2.2.10 binary compatibility
+- **Missing `.env` file** — Created `.env` for Secrets Gradle Plugin (CI build fix)
+- **Missing `local.properties`** — Added template (git-ignored)
+- **Release Signing** — Added `signingConfigs` block pointing to standard debug keystore
+- **Backup & Data Extraction Rules** — Replaced empty templates with actual Room DB + SharedPrefs rules
+- **Explicit `debug` buildType** — Added for build config completeness
+
 ## [1.2.0] - 2026-06-13
 
 ### Added
