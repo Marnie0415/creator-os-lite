@@ -52,47 +52,52 @@ class ProjectViewModel(
         description: String,
         deadline: Long,
         amount: Double,
-        onSuccess: () -> Unit = {}
+        onSuccess: () -> Unit = {},
+        onError: ((String) -> Unit)? = null
     ) {
         viewModelScope.launch {
-            val projectId = UUID.randomUUID().toString()
-            val now = System.currentTimeMillis()
+            try {
+                val projectId = UUID.randomUUID().toString()
+                val now = System.currentTimeMillis()
 
-            val newProject = Project(
-                id = projectId,
-                clientId = clientId,
-                title = title,
-                description = description,
-                status = ProjectStatus.InProgress.name,
-                deadline = deadline,
-                createdAt = now
-            )
-            projectRepository.insertProject(newProject)
-
-            val newInvoice = Invoice(
-                id = UUID.randomUUID().toString(),
-                projectId = projectId,
-                totalAmount = amount,
-                dueDate = deadline,
-                status = InvoiceStatus.Unpaid.name,
-                createdAt = now
-            )
-            invoiceRepository.insertInvoice(newInvoice)
-
-            val formattedAmount = com.example.ui.CurrencyUtils.format(amount)
-            val client = clientRepository.getClientById(clientId)
-            if (client != null) {
-                val timelineContent = "Project '$title' started. Invoice created with outstanding balance of $formattedAmount."
-                val timelineEntry = com.example.client.TimelineEntry(
-                    id = UUID.randomUUID().toString(),
+                val newProject = Project(
+                    id = projectId,
                     clientId = clientId,
-                    timestamp = now,
-                    content = timelineContent
+                    title = title,
+                    description = description,
+                    status = ProjectStatus.InProgress.name,
+                    deadline = deadline,
+                    createdAt = now
                 )
-                clientRepository.insertTimelineEntry(timelineEntry)
-            }
+                projectRepository.insertProject(newProject)
 
-            onSuccess()
+                val newInvoice = Invoice(
+                    id = UUID.randomUUID().toString(),
+                    projectId = projectId,
+                    totalAmount = amount,
+                    dueDate = deadline,
+                    status = InvoiceStatus.Unpaid.name,
+                    createdAt = now
+                )
+                invoiceRepository.insertInvoice(newInvoice)
+
+                val formattedAmount = com.example.ui.CurrencyUtils.format(amount)
+                val client = clientRepository.getClientById(clientId)
+                if (client != null) {
+                    val timelineContent = "Project '$title' started. Invoice created with outstanding balance of $formattedAmount."
+                    val timelineEntry = com.example.client.TimelineEntry(
+                        id = UUID.randomUUID().toString(),
+                        clientId = clientId,
+                        timestamp = now,
+                        content = timelineContent
+                    )
+                    clientRepository.insertTimelineEntry(timelineEntry)
+                }
+
+                onSuccess()
+            } catch (e: Exception) {
+                onError?.invoke(e.message ?: "Failed to create project")
+            }
         }
     }
 

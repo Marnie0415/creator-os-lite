@@ -112,6 +112,8 @@
     <string name="projects_edit_button">保存更改</string>
     <string name="projects_edit_saved">项⽬已更新</string>
     <string name="projects_deleted_snackbar">项⽬已删除</string>
+    <string name="projects_created_snackbar">项目与发票创建成功</string>
+    <string name="projects_created_error">创建失败，请重试</string>
     <string name="projects_status_confirm_title">确认更改状态？</string>
     <string name="projects_status_confirm_message">确定将状态更改为 %s？</string>
 

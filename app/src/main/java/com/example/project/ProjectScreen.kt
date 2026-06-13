@@ -48,6 +48,7 @@ fun ProjectScreen(
 
     var showAddDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf<ProjectListItem?>(null) }
+    var isSavingProject by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -259,7 +260,9 @@ fun ProjectScreen(
             AddProjectDialog(
                 clients = clients,
                 onDismiss = { showAddDialog = false },
+                isSaving = isSavingProject,
                 onSave = { clientId, title, desc, days, amount ->
+                    isSavingProject = true
                     val deadlineTime = System.currentTimeMillis() + (days * 24L * 60 * 60 * 1000)
                     projectViewModel.createProjectWithInvoice(
                         clientId = clientId,
@@ -267,7 +270,23 @@ fun ProjectScreen(
                         description = desc,
                         deadline = deadlineTime,
                         amount = amount,
-                        onSuccess = { showAddDialog = false }
+                        onSuccess = {
+                            isSavingProject = false
+                            showAddDialog = false
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    context.getString(R.string.projects_created_snackbar)
+                                )
+                            }
+                        },
+                        onError = { message ->
+                            isSavingProject = false
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    context.getString(R.string.projects_created_error)
+                                )
+                            }
+                        }
                     )
                 }
             )
@@ -647,8 +666,10 @@ fun EditProjectDialog(
 fun AddProjectDialog(
     clients: List<Client>,
     onDismiss: () -> Unit,
+    isSaving: Boolean = false,
     onSave: (clientId: String, title: String, desc: String, days: Int, amount: Double) -> Unit
 ) {
+    val inputEnabled = !isSaving
     var selectedClient by remember { mutableStateOf(clients.first()) }
     var title by remember { mutableStateOf("") }
     var desc by remember { mutableStateOf("") }
@@ -703,6 +724,7 @@ fun AddProjectDialog(
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
+                    enabled = inputEnabled,
                     label = { Text(stringResource(R.string.projects_create_title_label)) },
                     placeholder = { Text(stringResource(R.string.projects_create_title_placeholder)) },
                     modifier = Modifier
@@ -718,6 +740,7 @@ fun AddProjectDialog(
                 OutlinedTextField(
                     value = desc,
                     onValueChange = { desc = it },
+                    enabled = inputEnabled,
                     label = { Text(stringResource(R.string.projects_create_desc_label)) },
                     placeholder = { Text(stringResource(R.string.projects_create_desc_placeholder)) },
                     modifier = Modifier.fillMaxWidth(),
@@ -755,6 +778,7 @@ fun AddProjectDialog(
                 OutlinedTextField(
                     value = amount,
                     onValueChange = { amount = it },
+                    enabled = inputEnabled,
                     label = { Text(stringResource(R.string.projects_create_amount_label)) },
                     placeholder = { Text(stringResource(R.string.projects_create_amount_placeholder)) },
                     modifier = Modifier
@@ -772,15 +796,23 @@ fun AddProjectDialog(
             val amountNum = amount.toDoubleOrNull() ?: 0.0
             Button(
                 onClick = {
-                    if (title.isNotBlank() && amountNum > 0.0) {
+                    if (title.isNotBlank() && amountNum >= 0.0) {
                         onSave(selectedClient.id, title.trim(), desc.trim(), daysAhead, amountNum)
                     }
                 },
-                enabled = title.isNotBlank() && amountNum > 0.0,
+                enabled = !isSaving && title.isNotBlank() && amountNum >= 0.0,
                 colors = ButtonDefaults.buttonColors(containerColor = MoneyGreen, contentColor = Color.Black),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.testTag("save_project_button")
             ) {
+                if (isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = Color.Black,
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
                 Text(stringResource(R.string.projects_create_button), fontWeight = FontWeight.Bold)
             }
         },

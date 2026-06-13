@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.4.2] - 2026-06-14
+
+### Fixed
+- **"Create Project & Invoice" dialog not saving** — Amount field validation was too strict (required > 0), blocking saves when amount was "0" or empty
+- **Silent crash on project creation** — Added try-catch with error feedback in ProjectViewModel
+
+### Added
+- Success/error snackbar feedback when creating projects
+- Loading state in AddProjectDialog with disabled inputs during save
+
 ## [1.4.1] - 2026-06-14
 
 ### Fixed

@@ -112,6 +112,8 @@
     <string name="projects_edit_button">Save Changes</string>
     <string name="projects_edit_saved">Project updated successfully</string>
     <string name="projects_deleted_snackbar">Project deleted</string>
+    <string name="projects_created_snackbar">Project and invoice created successfully</string>
+    <string name="projects_created_error">Failed to create project. Please try again.</string>
     <string name="projects_status_confirm_title">Change Status?</string>
     <string name="projects_status_confirm_message">Are you sure you want to change the status to %s?</string>
 
