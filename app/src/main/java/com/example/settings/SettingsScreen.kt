@@ -1,5 +1,7 @@
 package com.example.settings
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -33,11 +35,13 @@ import com.example.ai.GeminiApiClient
 import com.example.ai.OpenAiService
 import com.example.client.ClientRepository
 import com.example.data.DataExporter
+import com.example.data.DataImporter
 import com.example.invoice.InvoiceRepository
 import com.example.project.ProjectRepository
 import com.example.ui.SettingsManager
 import com.example.ui.theme.MoneyGreen
 import com.example.ui.theme.WarningRed
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -155,6 +159,71 @@ fun SettingsScreen(
                         checked = currentIsDarkMode,
                         onCheckedChange = { settingsManager.setDarkMode(it) },
                         colors = SwitchDefaults.colors(checkedTrackColor = MoneyGreen)
+                    )
+                }
+            }
+
+            // ---- Risk Thresholds Card ----
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = null,
+                            tint = MoneyGreen,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.settings_risk_title),
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MoneyGreen
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.settings_risk_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary,
+                        lineHeight = 16.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    val currentGhostHours by settingsManager.ghostHours.collectAsState()
+                    Text(
+                        text = stringResource(R.string.settings_risk_ghost_label) + ": " + stringResource(R.string.settings_risk_hours, currentGhostHours),
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Slider(
+                        value = currentGhostHours.toFloat(),
+                        onValueChange = { settingsManager.setGhostHours(it.toInt()) },
+                        valueRange = 6f..168f,
+                        steps = 26,
+                        colors = SliderDefaults.colors(thumbColor = MoneyGreen, activeTrackColor = MoneyGreen)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    val currentExpiringHours by settingsManager.expiringHours.collectAsState()
+                    Text(
+                        text = stringResource(R.string.settings_risk_expiring_label) + ": " + stringResource(R.string.settings_risk_hours, currentExpiringHours),
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Slider(
+                        value = currentExpiringHours.toFloat(),
+                        onValueChange = { settingsManager.setExpiringHours(it.toInt()) },
+                        valueRange = 6f..168f,
+                        steps = 26,
+                        colors = SliderDefaults.colors(thumbColor = MoneyGreen, activeTrackColor = MoneyGreen)
                     )
                 }
             }
@@ -563,6 +632,94 @@ fun SettingsScreen(
                             }
                             Text(
                                 stringResource(R.string.export_button),
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                }
+            }
+
+            // ---- Data Import Card ----
+            if (clientRepository != null && projectRepository != null && invoiceRepository != null) {
+                val daoContext = context
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = null,
+                                tint = MoneyGreen,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.import_title),
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MoneyGreen
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(R.string.import_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.secondary,
+                            lineHeight = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        val clientsLauncher = rememberLauncherForActivityResult(
+                            ActivityResultContracts.OpenDocument()
+                        ) { uri ->
+                            if (uri != null) {
+                                coroutineScope.launch {
+                                    try {
+                                        val db = com.example.data.AppDatabase.getDatabase(daoContext)
+                                        val result = DataImporter.importAll(
+                                            context = daoContext,
+                                            clientsUri = uri,
+                                            timelinesUri = null,
+                                            projectsUri = null,
+                                            invoicesUri = null,
+                                            clientDao = db.clientDao(),
+                                            projectDao = db.projectDao(),
+                                            invoiceDao = db.invoiceDao()
+                                        )
+                                        exportSnackbarMessage = daoContext.getString(
+                                            R.string.import_success,
+                                            result.clientsImported,
+                                            result.projectsImported,
+                                            result.invoicesImported
+                                        )
+                                    } catch (e: Exception) {
+                                        exportSnackbarMessage = daoContext.getString(R.string.import_error)
+                                    }
+                                }
+                            }
+                        }
+
+                        Button(
+                            onClick = { clientsLauncher.launch(arrayOf("text/csv", "text/comma-separated-values", "*/*")) },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MoneyGreen,
+                                contentColor = Color.Black
+                            ),
+                            shape = RoundedCornerShape(4.dp),
+                            modifier = Modifier.fillMaxWidth().testTag("import_data_button")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                stringResource(R.string.import_button),
                                 fontWeight = FontWeight.SemiBold
                             )
                         }

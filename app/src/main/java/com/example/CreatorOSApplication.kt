@@ -1,10 +1,11 @@
 package com.example
 
 import android.app.Application
-import com.example.data.AppDatabase
 import com.example.client.ClientRepository
-import com.example.project.ProjectRepository
+import com.example.data.AppDatabase
+import com.example.data.NotificationHelper
 import com.example.invoice.InvoiceRepository
+import com.example.project.ProjectRepository
 import com.example.ui.SettingsManager
 
 class CreatorOSApplication : Application() {
@@ -20,5 +21,7 @@ class CreatorOSApplication : Application() {
         projectRepository = ProjectRepository(database.projectDao())
         invoiceRepository = InvoiceRepository(database.invoiceDao())
         settingsManager = SettingsManager.getInstance(this)
+        // Initialize notification channel
+        NotificationHelper.createChannel(this)
     }
 }

@@ -292,6 +292,87 @@ class RiskEngineTest {
 
     // ==================== Priority Ordering ====================
 
+    // ==================== Configurable Thresholds ====================
+
+    @Test
+    fun `custom ghost hours threshold changes ghost detection`() {
+        val client = makeClient(lastContact = now - 30 * hourMs) // 30h, less than default 48h
+        val project = makeProject(clientId = "c1")
+        // With default 48h threshold, 30h should NOT be ghosted
+        val defaultRisks = RiskEngine.generateRisks(
+            clients = listOf(client),
+            projects = listOf(project),
+            invoices = emptyList(),
+            currentTime = now,
+            ghostHours = 48
+        )
+        assertTrue("30h with 48h threshold should not ghost", defaultRisks.isEmpty())
+
+        // With custom 24h threshold, 30h SHOULD be ghosted
+        val customRisks = RiskEngine.generateRisks(
+            clients = listOf(client),
+            projects = listOf(project),
+            invoices = emptyList(),
+            currentTime = now,
+            ghostHours = 24
+        )
+        assertTrue("30h with 24h threshold should ghost", customRisks.isNotEmpty())
+        assertTrue(customRisks[0] is RiskItem.GhostedClient)
+    }
+
+    @Test
+    fun `custom expiring hours threshold changes expiring detection`() {
+        val client = makeClient()
+        val project = makeProject(deadline = now + 48 * hourMs) // 48h away
+        // With default 72h threshold, 48h SHOULD trigger
+        val defaultRisks = RiskEngine.generateRisks(
+            clients = listOf(client),
+            projects = listOf(project),
+            invoices = emptyList(),
+            currentTime = now,
+            expiringHours = 72
+        )
+        assertTrue("48h with 72h threshold should trigger expiring", defaultRisks.isNotEmpty())
+
+        // With custom 24h threshold, 48h should NOT trigger
+        val customRisks = RiskEngine.generateRisks(
+            clients = listOf(client),
+            projects = listOf(project),
+            invoices = emptyList(),
+            currentTime = now,
+            expiringHours = 24
+        )
+        assertTrue("48h with 24h threshold should not trigger", customRisks.isEmpty())
+    }
+
+    @Test
+    fun `minimum ghost threshold of 6 hours still works`() {
+        val client = makeClient(lastContact = now - 7 * hourMs) // 7h
+        val project = makeProject(clientId = "c1")
+        val risks = RiskEngine.generateRisks(
+            clients = listOf(client),
+            projects = listOf(project),
+            invoices = emptyList(),
+            currentTime = now,
+            ghostHours = 6
+        )
+        assertTrue("7h with 6h threshold should ghost", risks.isNotEmpty())
+    }
+
+    @Test
+    fun `maximum threshold of 168 hours works for expiring`() {
+        val client = makeClient()
+        val project = makeProject(deadline = now + 100 * hourMs)
+        val risks = RiskEngine.generateRisks(
+            clients = listOf(client),
+            projects = listOf(project),
+            invoices = emptyList(),
+            currentTime = now,
+            expiringHours = 168
+        )
+        assertTrue("100h with 168h threshold should trigger", risks.isNotEmpty())
+    }
+
     @Test
     fun `risks are sorted by severity Critical first then High then Medium`() {
         // Critical client

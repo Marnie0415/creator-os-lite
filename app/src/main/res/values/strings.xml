@@ -147,6 +147,31 @@
     <string name="export_button">Export Data</string>
     <string name="export_success">Data exported successfully! Choose how to share the CSV files.</string>
     <string name="export_error">Failed to export data. Please try again.</string>
+    <string name="export_snackbar_copied">File path copied to clipboard</string>
+
+    <!-- ==================== Data Import ==================== -->
+    <string name="import_title">DATA IMPORT</string>
+    <string name="import_desc">Restore data from a previous CSV export. All imported data is merged with existing data.</string>
+    <string name="import_button">Import from CSV</string>
+    <string name="import_pick_clients">Select Clients CSV</string>
+    <string name="import_pick_projects">Select Projects CSV</string>
+    <string name="import_pick_invoices">Select Invoices CSV</string>
+    <string name="import_success">Imported: %1$d clients, %2$d projects, %3$d invoices</string>
+    <string name="import_error">Import failed. Check file format and try again.</string>
+
+    <!-- ==================== Risk Thresholds ==================== -->
+    <string name="settings_risk_title">RISK THRESHOLDS</string>
+    <string name="settings_risk_desc">Customize when risk alerts trigger. Changes apply immediately.</string>
+    <string name="settings_risk_ghost_label">Ghosted after no contact for</string>
+    <string name="settings_risk_expiring_label">Project expires within</string>
+    <string name="settings_risk_hours">%d hours</string>
+
+    <!-- ==================== Notifications ==================== -->
+    <string name="notification_channel_name">Creator OS Alerts</string>
+    <string name="notification_channel_desc">Risk warnings for overdue invoices, ghosted clients, and expiring projects</string>
+    <string name="notification_overdue_title">⚠ Payment Overdue</string>
+    <string name="notification_expiring_title">⏰ Project Deadline</string>
+    <string name="notification_ghosted_title">👻 Client Ghosting</string>
     <string name="cd_settings_show_key">Show API key</string>
     <string name="cd_settings_hide_key">Hide API key</string>
 

@@ -76,11 +76,17 @@ sealed class RiskItem(
 
 object RiskEngine {
 
+    /** Default thresholds used when no custom config is provided. */
+    private const val DEFAULT_GHOST_HOURS = 48L
+    private const val DEFAULT_EXPIRING_HOURS = 72L
+
     fun generateRisks(
         clients: List<Client>,
         projects: List<Project>,
         invoices: List<Invoice>,
-        currentTime: Long = System.currentTimeMillis()
+        currentTime: Long = System.currentTimeMillis(),
+        ghostHours: Long = DEFAULT_GHOST_HOURS,
+        expiringHours: Long = DEFAULT_EXPIRING_HOURS
     ): List<RiskItem> {
         val risks = mutableListOf<RiskItem>()
 
@@ -95,7 +101,7 @@ object RiskEngine {
         val ghostedClients = clients.filter { client ->
             val hasActiveProj = clientActiveProjectIds.containsKey(client.id)
             val timeDiff = currentTime - client.lastContactTimestamp
-            hasActiveProj && (timeDiff > 48L * 60 * 60 * 1000)
+            hasActiveProj && (timeDiff > ghostHours * 60 * 60 * 1000)
         }
 
         // Find Overdue Invoices:
@@ -181,7 +187,7 @@ object RiskEngine {
         val expiringProjects = projects.filter { proj ->
             val isNotCompleted = proj.status != ProjectStatus.Completed.name
             val timeDiffToDeadline = proj.deadline - currentTime
-            isNotCompleted && (timeDiffToDeadline < 72L * 60 * 60 * 1000)
+            isNotCompleted && (timeDiffToDeadline < expiringHours * 60 * 60 * 1000)
         }
 
         for (proj in expiringProjects) {

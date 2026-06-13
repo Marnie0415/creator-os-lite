@@ -147,6 +147,30 @@
     <string name="export_button">导出数据</string>
     <string name="export_success">数据导出成功！</string>
     <string name="export_error">导出失败，请重试。</string>
+
+    <!-- ==================== Data Import ==================== -->
+    <string name="import_title">数据导入</string>
+    <string name="import_desc">从 CSV 导出文件恢复数据。导入的数据会与现有数据合并。</string>
+    <string name="import_button">从 CSV 导入</string>
+    <string name="import_pick_clients">选择客户 CSV</string>
+    <string name="import_pick_projects">选择项目 CSV</string>
+    <string name="import_pick_invoices">选择发票 CSV</string>
+    <string name="import_success">已导入：%1$d 个客户、%2$d 个项目、%3$d 张发票</string>
+    <string name="import_error">导入失败，请检查文件格式后重试。</string>
+
+    <!-- ==================== Risk Thresholds ==================== -->
+    <string name="settings_risk_title">风险阈值</string>
+    <string name="settings_risk_desc">自定义风险预警触发条件。更改立即生效。</string>
+    <string name="settings_risk_ghost_label">失联阈值</string>
+    <string name="settings_risk_expiring_label">到期预警</string>
+    <string name="settings_risk_hours">%d 小时</string>
+
+    <!-- ==================== Notifications ==================== -->
+    <string name="notification_channel_name">Creator OS 预警</string>
+    <string name="notification_channel_desc">逾期发票、失联客户和到期项目的风险预警</string>
+    <string name="notification_overdue_title">⚠ 付款逾期</string>
+    <string name="notification_expiring_title">⏰ 项目到期</string>
+    <string name="notification_ghosted_title">👻 客户失联</string>
     <string name="cd_settings_show_key">显示 API 密钥</string>
     <string name="cd_settings_hide_key">隐藏 API 密钥</string>
 

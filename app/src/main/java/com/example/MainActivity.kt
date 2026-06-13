@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
         val clientsList by clientViewModel.clientsList.collectAsState()
 
         val riskFeedViewModel = assistedViewModel {
-          DashboardViewModel(app.clientRepository, app.projectRepository, app.invoiceRepository)
+          DashboardViewModel(this@MainActivity, app.clientRepository, app.projectRepository, app.invoiceRepository, app.settingsManager)
         }
         val dashboardState by riskFeedViewModel.uiState.collectAsState()
 

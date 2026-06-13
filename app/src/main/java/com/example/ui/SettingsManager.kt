@@ -18,12 +18,29 @@ class SettingsManager(context: Context) {
         _isDarkMode.value = dark
     }
 
+    // --- Configurable risk thresholds ---
+    private val _ghostHours = MutableStateFlow(prefs.getInt("risk_ghost_hours", 48))
+    val ghostHours: StateFlow<Int> = _ghostHours
+
+    private val _expiringHours = MutableStateFlow(prefs.getInt("risk_expiring_hours", 72))
+    val expiringHours: StateFlow<Int> = _expiringHours
+
+    fun setGhostHours(hours: Int) {
+        prefs.edit().putInt("risk_ghost_hours", hours.coerceIn(6, 168)).apply()
+        _ghostHours.value = hours.coerceIn(6, 168)
+    }
+
+    fun setExpiringHours(hours: Int) {
+        prefs.edit().putInt("risk_expiring_hours", hours.coerceIn(6, 168)).apply()
+        _expiringHours.value = hours.coerceIn(6, 168)
+    }
+
     // --- Gemini API Key (legacy, kept for backward compatibility) ---
-    private val _apiKey = MutableStateFlow(prefs.getString("gemini_api_key", "") ?: "")
+    private val _apiKey = MutableStateFlow(CryptoManager.decrypt(prefs.getString("gemini_api_key", "") ?: ""))
     val apiKey: StateFlow<String> = _apiKey
 
     fun setApiKey(key: String) {
-        prefs.edit().putString("gemini_api_key", key).apply()
+        prefs.edit().putString("gemini_api_key", CryptoManager.encrypt(key)).apply()
         _apiKey.value = key
     }
 
@@ -36,7 +53,7 @@ class SettingsManager(context: Context) {
     )
     val providerType: StateFlow<AiProviderType> = _providerType
 
-    private val _providerApiKey = MutableStateFlow(prefs.getString("ai_provider_api_key", "") ?: "")
+    private val _providerApiKey = MutableStateFlow(CryptoManager.decrypt(prefs.getString("ai_provider_api_key", "") ?: ""))
     val providerApiKey: StateFlow<String> = _providerApiKey
 
     private val _providerModel = MutableStateFlow(prefs.getString("ai_provider_model", "") ?: "")
@@ -60,7 +77,7 @@ class SettingsManager(context: Context) {
     fun setProviderConfig(config: AiProviderConfig) {
         prefs.edit().apply {
             putString("ai_provider_type", config.type.name)
-            putString("ai_provider_api_key", config.apiKey)
+            putString("ai_provider_api_key", CryptoManager.encrypt(config.apiKey))
             putString("ai_provider_model", config.model)
             putString("ai_provider_base_url", config.baseUrl)
             apply()
