@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Backup rules for Creator OS Lite.
+  The app uses allowBackup="false" (no cloud backup by design).
+  These rules are defined for API 31+ compliance.
+-->
+<full-backup-content>
+    <include domain="sharedpref" path="creator_os_prefs.xml"/>
+    <include domain="database" path="creator_os_lite_db"/>
+    <exclude domain="sharedpref" path="device.xml"/>
+</full-backup-content>

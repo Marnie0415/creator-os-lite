@@ -1,0 +1,225 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">Creator OS Lite</string>
+
+    <!-- ==================== Navigation ==================== -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_clients">Clients</string>
+    <string name="nav_projects">Projects</string>
+    <string name="nav_ai_tools">AI Tools</string>
+    <string name="nav_settings">Settings</string>
+    <string name="cd_dashboard">Dashboard</string>
+    <string name="cd_clients">Clients</string>
+    <string name="cd_projects">Projects</string>
+    <string name="cd_ai_tools">AI Tools</string>
+    <string name="cd_settings">Settings</string>
+
+    <!-- ==================== Dashboard ==================== -->
+    <string name="dash_brand">CREATOR OS // LITE</string>
+    <string name="dash_title">Risk Radar</string>
+    <string name="dash_empty_title">RADAR INACTIVE</string>
+    <string name="dash_empty_desc">Set up your radar to start tracking financial risks! Follow this 3‑step flow:</string>
+    <string name="dash_step1">Create Client (Contact Channel)</string>
+    <string name="dash_step2">Create Project (Define Deadline)</string>
+    <string name="dash_step3">Set Payment Status (Unpaid/Deposit)</string>
+    <string name="dash_step1_button">Step 1: Create Client</string>
+    <string name="dash_step2_button">Step 2: Create Project &amp; Invoice</string>
+    <string name="dash_stat_ghosted">GHOSTED CLIENTS</string>
+    <string name="dash_stat_outstanding">OUTSTANDING INVOICES</string>
+    <string name="dash_stat_expiring">EXPIRING PROJECTS</string>
+    <string name="dash_revenue_collected">COLLECTED REVENUE</string>
+    <string name="dash_revenue_pending">PENDING REVENUE</string>
+    <string name="dash_radar_title">ACTIVE WARNING RADAR</string>
+    <string name="dash_secure_title">⚡ ALL SYSTEMS SECURE</string>
+    <string name="dash_secure_desc">No overdue payments, expiring deadlines, or ghosted clients detected.</string>
+    <string name="dash_badge_critical">CRITICAL RISK</string>
+    <string name="dash_badge_high">HIGH ALERT</string>
+    <string name="dash_badge_medium">MEDIUM ATTENTION</string>
+    <string name="cd_dash_setup_radar">Setup Radar</string>
+
+    <!-- ==================== Clients ==================== -->
+    <string name="clients_title">Clients</string>
+    <string name="clients_add">Add Client</string>
+    <string name="clients_empty_title">NO CLIENTS TRACKED CURRENTLY</string>
+    <string name="clients_empty_desc">Clients are the foundation of your risk warning system. Start tracking by creating your first client.</string>
+    <string name="clients_empty_button">Add Client</string>
+    <string name="clients_last_contact">LAST CONTACT</string>
+    <string name="clients_active_projects">ACTIVE PROJECTS</string>
+    <string name="clients_outstanding">OUTSTANDING DUE</string>
+    <string name="clients_detail_title">Client Details</string>
+    <string name="clients_metrics">METRICS OVERVIEW</string>
+    <string name="clients_contact_type">Contact Type</string>
+    <string name="clients_balance">Outstanding balance</string>
+    <string name="clients_log_title">LOG CLIENT INTERACTION</string>
+    <string name="clients_log_placeholder">Client requested cyber styling / Draft delivered…</string>
+    <string name="clients_log_button">Log Contact</string>
+    <string name="clients_timeline">CLIENT TIMELINE</string>
+    <string name="clients_timeline_empty">No history logged. Log custom client activities above to start creating contact patterns.</string>
+    <string name="clients_delete_title">Delete Client?</string>
+    <string name="clients_delete_message">Delete message</string>
+    <string name="clients_delete_confirm">Delete Cleanly</string>
+    <string name="clients_delete_cancel">Cancel</string>
+    <string name="clients_create_title">Create Client</string>
+    <string name="clients_create_name_label">Client Name</string>
+    <string name="clients_create_channel_label">Primary Contact Channel</string>
+    <string name="clients_create_button">Create Client</string>
+    <string name="clients_create_cancel">Cancel</string>
+    <string name="cd_clients_go_back">Go back</string>
+    <string name="cd_clients_add_client">Add Client</string>
+    <string name="cd_clients_delete_client">Delete client</string>
+    <string name="cd_clients_save_entry">Save log entry</string>
+    <string name="clients_search_placeholder">Search clients…</string>
+    <string name="clients_edit_title">Edit Client</string>
+    <string name="clients_edit_button">Save Changes</string>
+    <string name="clients_edit_saved">Client updated successfully</string>
+    <string name="clients_deleted_snackbar">Client and all related data deleted</string>
+    <string name="clients_created_snackbar">Client created successfully</string>
+
+    <!-- ==================== Projects ==================== -->
+    <string name="projects_title">Projects &amp; Invoices</string>
+    <string name="projects_add">Add Project</string>
+    <string name="projects_empty_title">NO PROJECTS TRACKED CURRENTLY</string>
+    <string name="projects_empty_desc">Projects and invoices are automatically generated together. Get started below:</string>
+    <string name="projects_empty_create_client_first">Create Client First</string>
+    <string name="projects_empty_add_button">Create Project &amp; Invoice</string>
+    <string name="projects_client_required_title">Client Required</string>
+    <string name="projects_client_required_message">You must create at least one client before configuring projects and invoices.</string>
+    <string name="projects_client_required_button">Create Client Now</string>
+    <string name="projects_client_required_cancel">Cancel</string>
+    <string name="projects_deadline_label">PROJECT DEADLINE</string>
+    <string name="projects_deadline_completed">Completed</string>
+    <string name="projects_invoice_label">EXPECTED INVOICE</string>
+    <string name="projects_status_project">PROJECT:</string>
+    <string name="projects_status_invoice">INVOICE PAYMENT:</string>
+    <string name="projects_none">None</string>
+    <string name="projects_create_title">Configure Project &amp; Invoice</string>
+    <string name="projects_create_client_label">Associated Client</string>
+    <string name="projects_create_title_label">Project Title</string>
+    <string name="projects_create_title_placeholder">e.g. Logo Redesign</string>
+    <string name="projects_create_desc_label">Requirements Brief</string>
+    <string name="projects_create_desc_placeholder">Draft deliverable spec…</string>
+    <string name="projects_create_deadline_format">Deadline: Due in %d Days</string>
+    <string name="projects_create_deadline_hint">Risk alerts will trigger within 72 hours of this date.</string>
+    <string name="projects_create_amount_label">Total Invoice Value ($)</string>
+    <string name="projects_create_amount_placeholder">e.g. 500</string>
+    <string name="projects_create_button">Start Tracking</string>
+    <string name="projects_create_cancel">Cancel</string>
+    <string name="cd_projects_add">Add Project</string>
+    <string name="cd_projects_delete">Delete project</string>
+    <string name="cd_projects_save">Save project</string>
+    <string name="projects_search_placeholder">Search projects…</string>
+    <string name="projects_edit_title">Edit Project &amp; Invoice</string>
+    <string name="projects_edit_button">Save Changes</string>
+    <string name="projects_edit_saved">Project updated successfully</string>
+    <string name="projects_deleted_snackbar">Project deleted</string>
+    <string name="projects_status_confirm_title">Change Status?</string>
+    <string name="projects_status_confirm_message">Are you sure you want to change the status to %s?</string>
+
+    <!-- ==================== Settings ==================== -->
+    <string name="settings_header_prefix">MANAGEMENT &amp; PREFERENCES</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_provider_card_title">AI PROVIDER</string>
+    <string name="settings_provider_card_desc">Select your AI provider and enter your API key. Keys are stored locally only.</string>
+    <string name="settings_provider_label">Provider</string>
+    <string name="settings_api_key_label">API Key</string>
+    <string name="settings_api_key_placeholder">sk-… or AIza…</string>
+    <string name="settings_model_label">Model</string>
+    <string name="settings_model_placeholder">Enter model name</string>
+    <string name="settings_base_url_label">API Base URL</string>
+    <string name="settings_base_url_placeholder">https://api.openai.com/v1</string>
+    <string name="settings_save_button">Save Configuration</string>
+    <string name="settings_saved_notice">✓ Configuration saved successfully using %s!</string>
+    <string name="settings_openai_ref_title">OPENAI-COMPATIBLE PROVIDERS</string>
+    <string name="settings_theme_title">THEME</string>
+    <string name="settings_theme_desc">Dark mode</string>
+    <string name="settings_about_title">ABOUT</string>
+    <string name="settings_about_text">Creator OS Lite • Open Source\nRisk Control Radar for Freelancers\nAI features require an API key from your chosen provider.</string>
+    <string name="settings_danger_title">DANGER ZONE</string>
+    <string name="settings_danger_desc">Wipe local storage and database cache cleanly. This resets all setup data.</string>
+    <string name="settings_danger_button">Reset All Application Data</string>
+    <string name="settings_reset_title">Are you absolutely sure?</string>
+    <string name="settings_reset_message">This will permanently delete all clients, projects, invoices and logged contact histories. This operation is irreversible.</string>
+    <string name="settings_reset_confirm">Yes, Wipe Everything</string>
+    <string name="settings_reset_cancel">Cancel</string>
+
+    <!-- ==================== Data Export ==================== -->
+    <string name="export_title">DATA EXPORT</string>
+    <string name="export_desc">Export all clients, projects, invoices, and timeline data as CSV files. Data is never sent to any server.</string>
+    <string name="export_button">Export Data</string>
+    <string name="export_success">Data exported successfully! Choose how to share the CSV files.</string>
+    <string name="export_error">Failed to export data. Please try again.</string>
+    <string name="export_snackbar_copied">File path copied to clipboard</string>
+
+    <!-- ==================== Data Import ==================== -->
+    <string name="import_title">DATA IMPORT</string>
+    <string name="import_desc">Restore data from a previous CSV export. All imported data is merged with existing data.</string>
+    <string name="import_button">Import from CSV</string>
+    <string name="import_pick_clients">Select Clients CSV</string>
+    <string name="import_pick_projects">Select Projects CSV</string>
+    <string name="import_pick_invoices">Select Invoices CSV</string>
+    <string name="import_success">Imported: %1$d clients, %2$d projects, %3$d invoices</string>
+    <string name="import_error">Import failed. Check file format and try again.</string>
+
+    <!-- ==================== Risk Thresholds ==================== -->
+    <string name="settings_risk_title">RISK THRESHOLDS</string>
+    <string name="settings_risk_desc">Customize when risk alerts trigger. Changes apply immediately.</string>
+    <string name="settings_risk_ghost_label">Ghosted after no contact for</string>
+    <string name="settings_risk_expiring_label">Project expires within</string>
+    <string name="settings_risk_hours">%d hours</string>
+
+    <!-- ==================== Notifications ==================== -->
+    <string name="notification_channel_name">Creator OS Alerts</string>
+    <string name="notification_channel_desc">Risk warnings for overdue invoices, ghosted clients, and expiring projects</string>
+    <string name="notification_overdue_title">⚠ Payment Overdue</string>
+    <string name="notification_expiring_title">⏰ Project Deadline</string>
+    <string name="notification_ghosted_title">👻 Client Ghosting</string>
+    <string name="cd_settings_show_key">Show API key</string>
+    <string name="cd_settings_hide_key">Hide API key</string>
+
+    <!-- ==================== AI Screen ==================== -->
+    <string name="ai_header">AI MONEY RECOVERY</string>
+    <string name="ai_title">AI Assistant</string>
+    <string name="ai_tab_followup">Follow-up Writer</string>
+    <string name="ai_tab_quote">AI Quote Assistant</string>
+    <string name="ai_followup_title">GENERATE A PAYMENT FOLLOW-UP</string>
+    <string name="ai_followup_autofill_label">Quick Autofill Overdue Client</string>
+    <string name="ai_followup_autofill_button">Pick Client In Danger</string>
+    <string name="ai_followup_client_label">Client Name</string>
+    <string name="ai_followup_amount_label">Outstanding Amount ($)</string>
+    <string name="ai_followup_situation_label">Brief situation context</string>
+    <string name="ai_followup_tone_label">Tone Mode</string>
+    <string name="ai_followup_tone_friendly">Friendly</string>
+    <string name="ai_followup_tone_professional">Professional</string>
+    <string name="ai_followup_tone_firm">Firm</string>
+    <string name="ai_followup_button">Generate Message</string>
+    <string name="ai_quote_title">STRUCTURE RAW CLIENT REQUIREMENTS</string>
+    <string name="ai_quote_placeholder">Paste requirements brief here, e.g. \'I need a cyber stylistic logo design for my music label.</string>
+    <string name="ai_quote_button">Structure Quote Proposal</string>
+    <string name="ai_result_copy">Copy Output Cleanly</string>
+    <string name="ai_result_clear">CLEAR</string>
+    <string name="ai_error_title">ENGINE ERROR</string>
+    <string name="ai_copied_toast">Message copied to clipboard cleanly!</string>
+    <string name="ai_no_key_error">API Key is missing. Go to Settings → AI Provider to configure your key.</string>
+    <string name="ai_empty_response_error">The AI returned an empty response. Please try again.</string>
+
+    <!-- ==================== ViewModels (error messages) ==================== -->
+    <string name="error_api_key_missing">API Key is missing. Go to Settings → AI Provider to configure your key.</string>
+    <string name="error_input_too_long">Input too long. Please shorten your text and try again.</string>
+    <string name="error_ai_empty">The AI returned an empty response. Please try again.</string>
+    <string name="error_ai_connection">Unable to connect to the AI service. Check your internet connection and API key.</string>
+    <string name="error_input_limit">Requirements text is too long. Please limit to %d characters.</string>
+
+    <!-- ==================== Common ==================== -->
+    <string name="common_currency_symbol">$</string>
+    <string name="common_unknown_client">Unknown Client</string>
+    <string name="common_just_now">Just now</string>
+    <string name="common_hours_ago">%d hr ago</string>
+    <string name="common_1_hour_ago">1 hr ago</string>
+    <string name="common_hours_left">%d hr left</string>
+    <string name="common_less_than_hour">Less than an hr left</string>
+    <string name="common_days_left">%d days left</string>
+    <string name="common_hours_overdue">%d hr overdue</string>
+    <string name="common_days_overdue">%d days overdue</string>
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancel</string>
+</resources>

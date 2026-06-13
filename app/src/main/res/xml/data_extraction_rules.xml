@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Data extraction rules for Creator OS Lite (Android 12+).
+  Defines what data can be transferred during device-to-device migration.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="sharedpref" path="creator_os_prefs.xml"/>
+        <include domain="database" path="creator_os_lite_db"/>
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="creator_os_prefs.xml"/>
+        <include domain="database" path="creator_os_lite_db"/>
+    </device-transfer>
+</data-extraction-rules>

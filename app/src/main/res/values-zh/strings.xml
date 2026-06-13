@@ -1,0 +1,224 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">Creator OS Lite</string>
+
+    <!-- ==================== Navigation ==================== -->
+    <string name="nav_dashboard">仪表盘</string>
+    <string name="nav_clients">客户</string>
+    <string name="nav_projects">项目</string>
+    <string name="nav_ai_tools">AI 工具</string>
+    <string name="nav_settings">设置</string>
+    <string name="cd_dashboard">仪表盘</string>
+    <string name="cd_clients">客户</string>
+    <string name="cd_projects">项目</string>
+    <string name="cd_ai_tools">AI 工具</string>
+    <string name="cd_settings">设置</string>
+
+    <!-- ==================== Dashboard ==================== -->
+    <string name="dash_brand">CREATOR OS // LITE</string>
+    <string name="dash_title">⻛险雷达</string>
+    <string name="dash_empty_title">雷达未启动</string>
+    <string name="dash_empty_desc">设置你的雷达，在数秒内开始追踪⻛险！按以下三步完成：</string>
+    <string name="dash_step1">创建客户（选择联系渠道）</string>
+    <string name="dash_step2">创建项目（设定截⽌⽇期）</string>
+    <string name="dash_step3">设置付款状态（未付款/已付定⾦）</string>
+    <string name="dash_step1_button">第 1 步：创建客户</string>
+    <string name="dash_step2_button">第 2 步：创建项目与发票</string>
+    <string name="dash_stat_ghosted">失联客户</string>
+    <string name="dash_stat_outstanding">逾期发票</string>
+    <string name="dash_stat_expiring">即将截⽌</string>
+    <string name="dash_revenue_collected">已收款</string>
+    <string name="dash_revenue_pending">待收款</string>
+    <string name="dash_radar_title">活跃警告雷达</string>
+    <string name="dash_secure_title">⚡ 一切安全</string>
+    <string name="dash_secure_desc">未检测到逾期付款、即将到期项⽬或失联客户。</string>
+    <string name="dash_badge_critical">⻛险等级：严重</string>
+    <string name="dash_badge_high">⻛险等级：高</string>
+    <string name="dash_badge_medium">⻛险等级：中</string>
+    <string name="cd_dash_setup_radar">设置雷达</string>
+
+    <!-- ==================== Clients ==================== -->
+    <string name="clients_title">客户</string>
+    <string name="clients_add">添加客户</string>
+    <string name="clients_empty_title">暂⽆客户</string>
+    <string name="clients_empty_desc">客户是⻛险预警系统的基础。创建你的第一个客户，开始追踪。</string>
+    <string name="clients_empty_button">添加客户</string>
+    <string name="clients_last_contact">上次联系</string>
+    <string name="clients_active_projects">活跃项⽬</string>
+    <string name="clients_outstanding">待收⾦额</string>
+    <string name="clients_detail_title">客户详情</string>
+    <string name="clients_metrics">数据概览</string>
+    <string name="clients_contact_type">联系类型</string>
+    <string name="clients_balance">待结余款</string>
+    <string name="clients_log_title">记录客户沟通</string>
+    <string name="clients_log_placeholder">客户要求赛博⻛格设计 / 初稿已交付…</string>
+    <string name="clients_log_button">记录联系</string>
+    <string name="clients_timeline">客户时间线</string>
+    <string name="clients_timeline_empty">暂⽆记录。在上⽅记录客户活动，开始创建联系模式。</string>
+    <string name="clients_delete_title">删除客户？</string>
+    <string name="clients_delete_message">这将删除客户「%s」及其关联的项⽬、发票和时间线记录。此操作不可撤销。</string>
+    <string name="clients_delete_confirm">确认删除</string>
+    <string name="clients_delete_cancel">取消</string>
+    <string name="clients_create_title">创建客户</string>
+    <string name="clients_create_name_label">客户名称</string>
+    <string name="clients_create_channel_label">主要联系渠道</string>
+    <string name="clients_create_button">创建客户</string>
+    <string name="clients_create_cancel">取消</string>
+    <string name="cd_clients_go_back">返回</string>
+    <string name="cd_clients_add_client">添加客户</string>
+    <string name="cd_clients_delete_client">删除客户</string>
+    <string name="cd_clients_save_entry">保存记录</string>
+    <string name="clients_search_placeholder">搜索客户…</string>
+    <string name="clients_edit_title">编辑客户</string>
+    <string name="clients_edit_button">保存更改</string>
+    <string name="clients_edit_saved">客户信息已更新</string>
+    <string name="clients_deleted_snackbar">客户及相关数据已删除</string>
+    <string name="clients_created_snackbar">客户创建成功</string>
+
+    <!-- ==================== Projects ==================== -->
+    <string name="projects_title">项⽬与发票</string>
+    <string name="projects_add">添加项⽬</string>
+    <string name="projects_empty_title">暂⽆项⽬</string>
+    <string name="projects_empty_desc">项⽬和发票会⾃动关联创建。开始吧：</string>
+    <string name="projects_empty_create_client_first">先创建客户</string>
+    <string name="projects_empty_add_button">创建项⽬与发票</string>
+    <string name="projects_client_required_title">需要客户</string>
+    <string name="projects_client_required_message">请⾄少创建⼀位客户后再配置项⽬和发票。</string>
+    <string name="projects_client_required_button">现在创建客户</string>
+    <string name="projects_client_required_cancel">取消</string>
+    <string name="projects_deadline_label">项⽬截⽌</string>
+    <string name="projects_deadline_completed">已完成</string>
+    <string name="projects_invoice_label">预期发票⾦额</string>
+    <string name="projects_status_project">项⽬状态：</string>
+    <string name="projects_status_invoice">发票付款：</string>
+    <string name="projects_none">⽆</string>
+    <string name="projects_create_title">配置项⽬与发票</string>
+    <string name="projects_create_client_label">关联客户</string>
+    <string name="projects_create_title_label">项⽬名称</string>
+    <string name="projects_create_title_placeholder">例如：Logo 重新设计</string>
+    <string name="projects_create_desc_label">需求简介</string>
+    <string name="projects_create_desc_placeholder">撰写交付物规格…</string>
+    <string name="projects_create_deadline_format">截⽌⽇期：%d 天后</string>
+    <string name="projects_create_deadline_hint">截⽌前 72 ⼩时触发⻛险警报。</string>
+    <string name="projects_create_amount_label">发票总⾦额（$）</string>
+    <string name="projects_create_amount_placeholder">例如：500</string>
+    <string name="projects_create_button">开始追踪</string>
+    <string name="projects_create_cancel">取消</string>
+    <string name="cd_projects_add">添加项⽬</string>
+    <string name="cd_projects_delete">删除项⽬</string>
+    <string name="cd_projects_save">保存项⽬</string>
+    <string name="projects_search_placeholder">搜索项⽬…</string>
+    <string name="projects_edit_title">编辑项⽬与发票</string>
+    <string name="projects_edit_button">保存更改</string>
+    <string name="projects_edit_saved">项⽬已更新</string>
+    <string name="projects_deleted_snackbar">项⽬已删除</string>
+    <string name="projects_status_confirm_title">确认更改状态？</string>
+    <string name="projects_status_confirm_message">确定将状态更改为 %s？</string>
+
+    <!-- ==================== Settings ==================== -->
+    <string name="settings_header_prefix">管理与偏好</string>
+    <string name="settings_title">设置</string>
+    <string name="settings_provider_card_title">AI 供应商</string>
+    <string name="settings_provider_card_desc">选择 AI 供应商并输⼊ API 密钥。密钥仅存储在本地。</string>
+    <string name="settings_provider_label">供应商</string>
+    <string name="settings_api_key_label">API 密钥</string>
+    <string name="settings_api_key_placeholder">sk-… 或 AIza…</string>
+    <string name="settings_model_label">模型</string>
+    <string name="settings_model_placeholder">输⼊模型名称</string>
+    <string name="settings_base_url_label">API 基础地址</string>
+    <string name="settings_base_url_placeholder">https://api.openai.com/v1</string>
+    <string name="settings_save_button">保存配置</string>
+    <string name="settings_saved_notice">✓ 已成功保存 %s 的配置！</string>
+    <string name="settings_openai_ref_title">OPENAI 兼容供应商</string>
+    <string name="settings_theme_title">主题</string>
+    <string name="settings_theme_desc">深色模式</string>
+    <string name="settings_about_title">关于</string>
+    <string name="settings_about_text">Creator OS Lite • 开源\n⾃由职业者⻛险控制雷达\nAI 功能需要⾃备 API 密钥</string>
+    <string name="settings_danger_title">危险区域</string>
+    <string name="settings_danger_desc">清空本地存储和数据库缓存。这将重置所有数据。</string>
+    <string name="settings_danger_button">重置所有应⽤数据</string>
+    <string name="settings_reset_title">确定要执⾏此操作吗？</string>
+    <string name="settings_reset_message">这将永久删除所有客户、项⽬、发票和联系记录。此操作不可撤销。</string>
+    <string name="settings_reset_confirm">是的，全部清除</string>
+    <string name="settings_reset_cancel">取消</string>
+
+    <!-- ==================== Data Export ==================== -->
+    <string name="export_title">数据导出</string>
+    <string name="export_desc">导出所有客户、项目、发票和时间线数据为 CSV 文件。数据不会发送到任何服务器。</string>
+    <string name="export_button">导出数据</string>
+    <string name="export_success">数据导出成功！</string>
+    <string name="export_error">导出失败，请重试。</string>
+
+    <!-- ==================== Data Import ==================== -->
+    <string name="import_title">数据导入</string>
+    <string name="import_desc">从 CSV 导出文件恢复数据。导入的数据会与现有数据合并。</string>
+    <string name="import_button">从 CSV 导入</string>
+    <string name="import_pick_clients">选择客户 CSV</string>
+    <string name="import_pick_projects">选择项目 CSV</string>
+    <string name="import_pick_invoices">选择发票 CSV</string>
+    <string name="import_success">已导入：%1$d 个客户、%2$d 个项目、%3$d 张发票</string>
+    <string name="import_error">导入失败，请检查文件格式后重试。</string>
+
+    <!-- ==================== Risk Thresholds ==================== -->
+    <string name="settings_risk_title">风险阈值</string>
+    <string name="settings_risk_desc">自定义风险预警触发条件。更改立即生效。</string>
+    <string name="settings_risk_ghost_label">失联阈值</string>
+    <string name="settings_risk_expiring_label">到期预警</string>
+    <string name="settings_risk_hours">%d 小时</string>
+
+    <!-- ==================== Notifications ==================== -->
+    <string name="notification_channel_name">Creator OS 预警</string>
+    <string name="notification_channel_desc">逾期发票、失联客户和到期项目的风险预警</string>
+    <string name="notification_overdue_title">⚠ 付款逾期</string>
+    <string name="notification_expiring_title">⏰ 项目到期</string>
+    <string name="notification_ghosted_title">👻 客户失联</string>
+    <string name="cd_settings_show_key">显示 API 密钥</string>
+    <string name="cd_settings_hide_key">隐藏 API 密钥</string>
+
+    <!-- ==================== AI Screen ==================== -->
+    <string name="ai_header">AI 追款助⼿</string>
+    <string name="ai_title">AI 助⼿</string>
+    <string name="ai_tab_followup">催款⽂案⽣成</string>
+    <string name="ai_tab_quote">报价助⼿</string>
+    <string name="ai_followup_title">⽣成付款提醒</string>
+    <string name="ai_followup_autofill_label">快速选择逾期客户</string>
+    <string name="ai_followup_autofill_button">选择有⻛险的客户</string>
+    <string name="ai_followup_client_label">客户名称</string>
+    <string name="ai_followup_amount_label">未付⾦额（$）</string>
+    <string name="ai_followup_situation_label">简要情况描述</string>
+    <string name="ai_followup_tone_label">语⽓模式</string>
+    <string name="ai_followup_tone_friendly">友好</string>
+    <string name="ai_followup_tone_professional">专业</string>
+    <string name="ai_followup_tone_firm">坚定</string>
+    <string name="ai_followup_button">⽣成消息</string>
+    <string name="ai_quote_title">整理客户需求为报价</string>
+    <string name="ai_quote_placeholder">粘贴需求简述，如：\"我需要为⾳乐标签设计赛博⻛格 Logo\"</string>
+    <string name="ai_quote_button">⽣成报价⽅案</string>
+    <string name="ai_result_copy">复制输出</string>
+    <string name="ai_result_clear">清除</string>
+    <string name="ai_error_title">引擎错误</string>
+    <string name="ai_copied_toast">消息已复制到剪贴板！</string>
+    <string name="ai_no_key_error">缺少 API 密钥。请前往设置 → AI 供应商配置。</string>
+    <string name="ai_empty_response_error">AI 返回了空响应，请重试。</string>
+
+    <!-- ==================== ViewModels (error messages) ==================== -->
+    <string name="error_api_key_missing">缺少 API 密钥。请前往设置 → AI 供应商配置。</string>
+    <string name="error_input_too_long">输⼊内容过⻓，请缩短后重试。</string>
+    <string name="error_ai_empty">AI 返回了空响应，请重试。</string>
+    <string name="error_ai_connection">⽆法连接到 AI 服务。请检查⽹络连接和 API 密钥。</string>
+    <string name="error_input_limit">需求⽂本过⻓，请限制在 %d 个字符以内。</string>
+
+    <!-- ==================== Common ==================== -->
+    <string name="common_currency_symbol">$</string>
+    <string name="common_unknown_client">未知客户</string>
+    <string name="common_just_now">刚刚</string>
+    <string name="common_hours_ago">%d ⼩时前</string>
+    <string name="common_1_hour_ago">1 ⼩时前</string>
+    <string name="common_hours_left">还剩 %d ⼩时</string>
+    <string name="common_less_than_hour">不⾜ 1 ⼩时</string>
+    <string name="common_days_left">还剩 %d 天</string>
+    <string name="common_hours_overdue">逾期 %d ⼩时</string>
+    <string name="common_days_overdue">逾期 %d 天</string>
+    <string name="common_ok">确定</string>
+    <string name="common_cancel">取消</string>
+</resources>
