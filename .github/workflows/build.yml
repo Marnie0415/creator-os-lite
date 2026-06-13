@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (optional)'
+        required: false
+        type: string
 
 jobs:
   build:
@@ -20,6 +26,9 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      - name: Generate Gradle Wrapper
+        run: gradle wrapper --gradle-version=8.13
 
       - name: Build debug APK
         run: ./gradlew assembleDebug
