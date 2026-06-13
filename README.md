@@ -83,7 +83,7 @@ All data stays on your device. No accounts, no cloud sync, no telemetry. AI call
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/creator-os-lite.git
+   git clone https://github.com/Marnie0415/creator-os-lite.git
    ```
 
 2. Open the project in Android Studio
