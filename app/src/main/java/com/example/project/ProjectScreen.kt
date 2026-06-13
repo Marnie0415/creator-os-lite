@@ -11,11 +11,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -29,6 +31,7 @@ import com.example.invoice.InvoiceViewModel
 import com.example.ui.TimeFormatter
 import com.example.ui.theme.MoneyGreen
 import com.example.ui.theme.WarningRed
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +47,19 @@ fun ProjectScreen(
     val projectsList by projectViewModel.projectsList.collectAsState()
 
     var showAddDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf<ProjectListItem?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    val filteredProjects = remember(projectsList, searchQuery) {
+        if (searchQuery.isBlank()) projectsList
+        else projectsList.filter {
+            it.project.title.contains(searchQuery, ignoreCase = true) ||
+            it.clientName.contains(searchQuery, ignoreCase = true)
+        }
+    }
 
     LaunchedEffect(triggerShowAddProjectDialog) {
         if (triggerShowAddProjectDialog) {
@@ -53,6 +69,7 @@ fun ProjectScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.projects_title), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold) },
@@ -130,31 +147,74 @@ fun ProjectScreen(
                 }
             }
         } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(projectsList, key = { it.project.id }) { item ->
-                    ProjectRowCard(
-                        item = item,
-                        onUpdateProjectStatus = { newStatus ->
-                            projectViewModel.updateProjectStatus(item.project.id, newStatus)
-                        },
-                        onUpdateInvoiceStatus = { newStatus ->
-                            if (item.invoice != null) {
-                                invoiceViewModel.updateInvoiceStatus(item.invoice.id, newStatus)
-                            }
-                        },
-                        onDeleteProject = {
-                            projectViewModel.deleteProject(item.project.id)
+            Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+                // Search bar
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = { Text(stringResource(R.string.projects_search_placeholder)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .testTag("project_search_field"),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MoneyGreen,
+                        focusedLabelColor = MoneyGreen
+                    ),
+                    singleLine = true,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Assignment,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                )
+
+                if (filteredProjects.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No projects matching \"$searchQuery\"",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(filteredProjects, key = { it.project.id }) { item ->
+                            ProjectRowCard(
+                                item = item,
+                                onUpdateProjectStatus = { newStatus ->
+                                    projectViewModel.updateProjectStatus(item.project.id, newStatus)
+                                },
+                                onUpdateInvoiceStatus = { newStatus ->
+                                    if (item.invoice != null) {
+                                        invoiceViewModel.updateInvoiceStatus(item.invoice.id, newStatus)
+                                    }
+                                },
+                                onEditProject = { showEditDialog = item },
+                                onDeleteProject = {
+                                    projectViewModel.deleteProject(item.project.id)
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar(context.getString(R.string.projects_deleted_snackbar))
+                                    }
+                                }
+                            )
                         }
-                    )
-                }
-                item {
-                    Spacer(modifier = Modifier.height(24.dp))
+                        item {
+                            Spacer(modifier = Modifier.height(24.dp))
+                        }
+                    }
                 }
             }
         }
@@ -201,6 +261,40 @@ fun ProjectScreen(
             )
         }
     }
+
+    // Edit project dialog
+    if (showEditDialog != null) {
+        val editItem = showEditDialog!!
+        val project = editItem.project
+        val invoice = editItem.invoice
+        val client = clients.find { it.id == project.clientId } ?: clients.firstOrNull()
+
+        if (client != null) {
+            EditProjectDialog(
+                currentTitle = project.title,
+                currentDesc = project.description,
+                currentDeadlineDays = ((project.deadline - System.currentTimeMillis()) / (24L * 60 * 60 * 1000)).toInt().coerceIn(1, 30),
+                currentAmount = invoice?.totalAmount ?: 0.0,
+                currentClient = client,
+                clients = clients,
+                onDismiss = { showEditDialog = null },
+                onSave = { title, desc, days, amount ->
+                    projectViewModel.updateProject(
+                        projectId = project.id,
+                        title = title,
+                        description = desc,
+                        deadline = System.currentTimeMillis() + (days * 24L * 60 * 60 * 1000),
+                        amount = amount,
+                        invoiceId = invoice?.id
+                    )
+                    showEditDialog = null
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(context.getString(R.string.projects_edit_saved))
+                    }
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -208,6 +302,7 @@ fun ProjectRowCard(
     item: ProjectListItem,
     onUpdateProjectStatus: (ProjectStatus) -> Unit,
     onUpdateInvoiceStatus: (InvoiceStatus) -> Unit,
+    onEditProject: () -> Unit = {},
     onDeleteProject: () -> Unit
 ) {
     val project = item.project
@@ -254,16 +349,29 @@ fun ProjectRowCard(
                     )
                 }
 
-                IconButton(
-                    onClick = onDeleteProject,
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = stringResource(R.string.cd_projects_delete),
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(18.dp)
-                    )
+                Row {
+                    IconButton(
+                        onClick = onEditProject,
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.projects_edit_title),
+                            tint = MoneyGreen,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = onDeleteProject,
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.cd_projects_delete),
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
             }
 
@@ -410,6 +518,117 @@ fun ProjectRowCard(
             }
         }
     }
+}
+
+@Composable
+fun EditProjectDialog(
+    currentTitle: String,
+    currentDesc: String,
+    currentDeadlineDays: Int,
+    currentAmount: Double,
+    currentClient: Client,
+    clients: List<Client>,
+    onDismiss: () -> Unit,
+    onSave: (title: String, desc: String, days: Int, amount: Double) -> Unit
+) {
+    var title by remember { mutableStateOf(currentTitle) }
+    var desc by remember { mutableStateOf(currentDesc) }
+    var daysAhead by remember { mutableStateOf(currentDeadlineDays) }
+    var amount by remember { mutableStateOf(currentAmount.toString()) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.projects_edit_title), fontWeight = FontWeight.Bold) },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.projects_create_client_label) + ": ${currentClient.name}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MoneyGreen,
+                    fontWeight = FontWeight.Bold
+                )
+
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text(stringResource(R.string.projects_create_title_label)) },
+                    modifier = Modifier.fillMaxWidth().testTag("edit_project_title_input"),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MoneyGreen,
+                        focusedLabelColor = MoneyGreen
+                    ),
+                    singleLine = true
+                )
+
+                OutlinedTextField(
+                    value = desc,
+                    onValueChange = { desc = it },
+                    label = { Text(stringResource(R.string.projects_create_desc_label)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MoneyGreen,
+                        focusedLabelColor = MoneyGreen
+                    ),
+                    maxLines = 3
+                )
+
+                Column {
+                    Text(
+                        stringResource(R.string.projects_create_deadline_format, daysAhead),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Slider(
+                        value = daysAhead.toFloat(),
+                        onValueChange = { daysAhead = it.toInt() },
+                        valueRange = 1f..30f,
+                        steps = 29,
+                        colors = SliderDefaults.colors(
+                            thumbColor = MoneyGreen,
+                            activeTrackColor = MoneyGreen
+                        )
+                    )
+                }
+
+                OutlinedTextField(
+                    value = amount,
+                    onValueChange = { amount = it },
+                    label = { Text(stringResource(R.string.projects_create_amount_label)) },
+                    modifier = Modifier.fillMaxWidth().testTag("edit_project_amount_input"),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MoneyGreen,
+                        focusedLabelColor = MoneyGreen
+                    ),
+                    singleLine = true
+                )
+            }
+        },
+        confirmButton = {
+            val amountNum = amount.toDoubleOrNull() ?: currentAmount
+            Button(
+                onClick = {
+                    if (title.isNotBlank()) {
+                        onSave(title.trim(), desc.trim(), daysAhead, amountNum)
+                    }
+                },
+                enabled = title.isNotBlank(),
+                colors = ButtonDefaults.buttonColors(containerColor = MoneyGreen, contentColor = Color.Black),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.testTag("save_edit_project_button")
+            ) {
+                Text(stringResource(R.string.projects_edit_button), fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.projects_create_cancel), color = MaterialTheme.colorScheme.onSurface)
+            }
+        }
+    )
 }
 
 @Composable

@@ -9,6 +9,15 @@ import kotlinx.coroutines.flow.StateFlow
 class SettingsManager(context: Context) {
     private val prefs = context.getSharedPreferences("creator_os_prefs", Context.MODE_PRIVATE)
 
+    // --- Theme preference ---
+    private val _isDarkMode = MutableStateFlow(prefs.getBoolean("is_dark_mode", true))
+    val isDarkMode: StateFlow<Boolean> = _isDarkMode
+
+    fun setDarkMode(dark: Boolean) {
+        prefs.edit().putBoolean("is_dark_mode", dark).apply()
+        _isDarkMode.value = dark
+    }
+
     // --- Gemini API Key (legacy, kept for backward compatibility) ---
     private val _apiKey = MutableStateFlow(prefs.getString("gemini_api_key", "") ?: "")
     val apiKey: StateFlow<String> = _apiKey

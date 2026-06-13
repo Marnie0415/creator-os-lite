@@ -48,7 +48,8 @@ class MainActivity : ComponentActivity() {
     val app = application as CreatorOSApplication
 
     setContent {
-      MyApplicationTheme {
+      val isDarkMode by app.settingsManager.isDarkMode.collectAsState()
+      MyApplicationTheme(isDarkTheme = isDarkMode) {
         val navController = rememberNavController()
 
         val clientViewModel = assistedViewModel {
@@ -200,12 +201,16 @@ class MainActivity : ComponentActivity() {
             composable("ai_tools") {
               AiScreen(
                 viewModel = aiViewModel,
-                ghostedOrOverdueClients = ghostedAndOverdue
+                ghostedOrOverdueClients = ghostedAndOverdue,
+                onNavigateToSettings = { navController.navigate("settings") }
               )
             }
             composable("settings") {
               SettingsScreen(
                 settingsManager = app.settingsManager,
+                clientRepository = app.clientRepository,
+                projectRepository = app.projectRepository,
+                invoiceRepository = app.invoiceRepository,
                 onResetDatabase = {
                   lifecycleScope.launch(Dispatchers.IO) {
                     AppDatabase.getDatabase(this@MainActivity).clearAllTables()

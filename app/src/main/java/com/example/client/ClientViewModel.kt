@@ -122,6 +122,15 @@ class ClientViewModel(
         }
     }
 
+    fun updateClient(clientId: String, newName: String, newChannel: ContactChannel) {
+        viewModelScope.launch {
+            val old = clientRepository.getClientById(clientId) ?: return@launch
+            val updated = old.copy(name = newName, contactChannel = newChannel.name)
+            clientRepository.updateClient(updated)
+            addTimelineEntry(clientId, "Client info updated: name → '$newName', channel → ${newChannel.name}")
+        }
+    }
+
     fun deleteClient(clientId: String) {
         viewModelScope.launch {
             clientRepository.deleteClient(clientId)

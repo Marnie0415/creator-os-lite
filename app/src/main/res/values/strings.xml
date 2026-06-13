@@ -67,6 +67,12 @@
     <string name="cd_clients_add_client">Add Client</string>
     <string name="cd_clients_delete_client">Delete client</string>
     <string name="cd_clients_save_entry">Save log entry</string>
+    <string name="clients_search_placeholder">Search clients…</string>
+    <string name="clients_edit_title">Edit Client</string>
+    <string name="clients_edit_button">Save Changes</string>
+    <string name="clients_edit_saved">Client updated successfully</string>
+    <string name="clients_deleted_snackbar">Client and all related data deleted</string>
+    <string name="clients_created_snackbar">Client created successfully</string>
 
     <!-- ==================== Projects ==================== -->
     <string name="projects_title">Projects &amp; Invoices</string>
@@ -100,6 +106,13 @@
     <string name="cd_projects_add">Add Project</string>
     <string name="cd_projects_delete">Delete project</string>
     <string name="cd_projects_save">Save project</string>
+    <string name="projects_search_placeholder">Search projects…</string>
+    <string name="projects_edit_title">Edit Project &amp; Invoice</string>
+    <string name="projects_edit_button">Save Changes</string>
+    <string name="projects_edit_saved">Project updated successfully</string>
+    <string name="projects_deleted_snackbar">Project deleted</string>
+    <string name="projects_status_confirm_title">Change Status?</string>
+    <string name="projects_status_confirm_message">Are you sure you want to change the status to %s?</string>
 
     <!-- ==================== Settings ==================== -->
     <string name="settings_header_prefix">MANAGEMENT &amp; PREFERENCES</string>
@@ -116,6 +129,8 @@
     <string name="settings_save_button">Save Configuration</string>
     <string name="settings_saved_notice">✓ Configuration saved successfully using %s!</string>
     <string name="settings_openai_ref_title">OPENAI-COMPATIBLE PROVIDERS</string>
+    <string name="settings_theme_title">THEME</string>
+    <string name="settings_theme_desc">Dark mode</string>
     <string name="settings_about_title">ABOUT</string>
     <string name="settings_about_text">Creator OS Lite • Open Source\nRisk Control Radar for Freelancers\nAI features require an API key from your chosen provider.</string>
     <string name="settings_danger_title">DANGER ZONE</string>
@@ -125,6 +140,13 @@
     <string name="settings_reset_message">This will permanently delete all clients, projects, invoices and logged contact histories. This operation is irreversible.</string>
     <string name="settings_reset_confirm">Yes, Wipe Everything</string>
     <string name="settings_reset_cancel">Cancel</string>
+
+    <!-- ==================== Data Export ==================== -->
+    <string name="export_title">DATA EXPORT</string>
+    <string name="export_desc">Export all clients, projects, invoices, and timeline data as CSV files. Data is never sent to any server.</string>
+    <string name="export_button">Export Data</string>
+    <string name="export_success">Data exported successfully! Choose how to share the CSV files.</string>
+    <string name="export_error">Failed to export data. Please try again.</string>
     <string name="cd_settings_show_key">Show API key</string>
     <string name="cd_settings_hide_key">Hide API key</string>
 

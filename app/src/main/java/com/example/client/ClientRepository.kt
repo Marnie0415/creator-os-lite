@@ -18,6 +18,10 @@ class ClientRepository(private val clientDao: ClientDao) {
         clientDao.insertClient(client)
     }
 
+    suspend fun updateClient(client: Client) {
+        clientDao.updateClient(client)
+    }
+
     suspend fun deleteClient(id: String) {
         clientDao.deleteClientById(id)
     }

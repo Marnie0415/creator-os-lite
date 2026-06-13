@@ -119,6 +119,47 @@ class ProjectViewModel(
         }
     }
 
+    fun updateProject(
+        projectId: String,
+        title: String,
+        description: String,
+        deadline: Long,
+        amount: Double,
+        invoiceId: String? = null
+    ) {
+        viewModelScope.launch {
+            val proj = projectRepository.getProjectById(projectId) ?: return@launch
+            val updated = proj.copy(
+                title = title,
+                description = description,
+                deadline = deadline
+            )
+            projectRepository.insertProject(updated)
+
+            // Update invoice amount if invoiceId is provided
+            if (invoiceId != null) {
+                val inv = invoiceRepository.getInvoiceForProject(projectId)
+                if (inv != null) {
+                    val updatedInv = inv.copy(totalAmount = amount)
+                    invoiceRepository.insertInvoice(updatedInv)
+                }
+            }
+
+            // Log to timeline
+            val client = clientRepository.getClientById(proj.clientId)
+            if (client != null) {
+                val now = System.currentTimeMillis()
+                val timelineEntry = com.example.client.TimelineEntry(
+                    id = java.util.UUID.randomUUID().toString(),
+                    clientId = proj.clientId,
+                    timestamp = now,
+                    content = "Project '$title' was updated (editing details/amount)."
+                )
+                clientRepository.insertTimelineEntry(timelineEntry)
+            }
+        }
+    }
+
     fun deleteProject(id: String) {
         viewModelScope.launch {
             val proj = projectRepository.getProjectById(id)

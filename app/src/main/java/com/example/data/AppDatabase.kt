@@ -22,7 +22,7 @@ import androidx.room.TypeConverters
         Project::class,
         Invoice::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -46,6 +46,27 @@ abstract class AppDatabase : RoomDatabase() {
          * Fixed: timeline_entries uses `content` (not `notes`) and omits `eventType`
          * to match the TimelineEntry entity.
          */
+        /**
+         * Migration from version 2 to 3:
+         * No schema changes — version bump to align with entity definitions.
+         */
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // No schema changes in this version
+            }
+        }
+
+        /**
+         * Migration from version 3 to 4:
+         * No schema changes — placeholder for future schema evolution.
+         * Added to provide a safe upgrade path without destructive migration.
+         */
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // No schema changes in this version
+            }
+        }
+
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("""
@@ -96,9 +117,10 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "creator_os_lite_db"
                 )
-                // Pre-release: destructive migration is acceptable.
-                // For production releases, add MIGRATION_2_3, MIGRATION_3_4, etc.
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                // Last-resort fallback for unexpected version skew.
                 .fallbackToDestructiveMigration()
+                .fallbackToDestructiveMigrationOnDatabaseDowngrade()
                 .build()
                 .also { INSTANCE = it }
             }

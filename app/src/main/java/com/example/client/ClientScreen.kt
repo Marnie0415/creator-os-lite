@@ -12,12 +12,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -28,6 +30,7 @@ import com.example.R
 import com.example.ui.TimeFormatter
 import com.example.ui.theme.MoneyGreen
 import com.example.ui.theme.WarningRed
+import kotlinx.coroutines.launch
 
 @Composable
 fun ClientScreen(
@@ -41,6 +44,11 @@ fun ClientScreen(
     val clientDetail by viewModel.clientDetail.collectAsState()
 
     var showAddDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf<String?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
 
     LaunchedEffect(triggerShowAddClientDialog) {
         if (triggerShowAddClientDialog) {
@@ -49,54 +57,87 @@ fun ClientScreen(
         }
     }
 
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = MaterialTheme.colorScheme.background
     ) {
-        AnimatedContent(
-            targetState = selectedClientId,
-            transitionSpec = {
-                if (targetState != null) {
-                    slideInHorizontally { width -> width } + fadeIn() togetherWith
-                            slideOutHorizontally { width -> -width } + fadeOut()
-                } else {
-                    slideInHorizontally { width -> -width } + fadeIn() togetherWith
-                            slideOutHorizontally { width -> width } + fadeOut()
-                }
-            },
-            label = "ClientDetailNavigation"
-        ) { targetClientId ->
-            if (targetClientId == null) {
-                ClientListContent(
-                    clients = clientsList,
-                    onClientClick = { viewModel.selectClient(it.id) },
-                    onAddClientClick = { showAddDialog = true }
-                )
-            } else {
-                if (clientDetail != null) {
-                    ClientDetailContent(
-                        state = clientDetail!!,
-                        onBack = { viewModel.selectClient(null) },
-                        onDeleteClient = { viewModel.deleteClient(targetClientId) },
-                        onAddTimelineEntry = { content -> viewModel.addTimelineEntry(targetClientId, content) },
-                        onDeleteTimelineEntry = { entryId -> viewModel.deleteTimelineEntry(entryId) }
+        Surface(
+            modifier = modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            AnimatedContent(
+                targetState = selectedClientId,
+                transitionSpec = {
+                    if (targetState != null) {
+                        slideInHorizontally { width -> width } + fadeIn() togetherWith
+                                slideOutHorizontally { width -> -width } + fadeOut()
+                    } else {
+                        slideInHorizontally { width -> -width } + fadeIn() togetherWith
+                                slideOutHorizontally { width -> width } + fadeOut()
+                    }
+                },
+                label = "ClientDetailNavigation"
+            ) { targetClientId ->
+                if (targetClientId == null) {
+                    ClientListContent(
+                        clients = clientsList,
+                        onClientClick = { viewModel.selectClient(it.id) },
+                        onAddClientClick = { showAddDialog = true }
                     )
                 } else {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = MoneyGreen)
+                    if (clientDetail != null) {
+                        ClientDetailContent(
+                            state = clientDetail!!,
+                            onBack = { viewModel.selectClient(null) },
+                            onEditClient = { showEditDialog = clientDetail!!.client?.id },
+                            onDeleteClient = {
+                                viewModel.deleteClient(targetClientId)
+                                viewModel.selectClient(null)
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(context.getString(R.string.clients_deleted_snackbar))
+                                }
+                            },
+                            onAddTimelineEntry = { content -> viewModel.addTimelineEntry(targetClientId, content) },
+                            onDeleteTimelineEntry = { entryId -> viewModel.deleteTimelineEntry(entryId) }
+                        )
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = MoneyGreen)
+                        }
                     }
                 }
             }
-        }
 
-        if (showAddDialog) {
-            AddClientDialog(
-                onDismiss = { showAddDialog = false },
-                onSave = { name, channel ->
-                    viewModel.createClient(name, channel)
-                    showAddDialog = false
+            if (showAddDialog) {
+                AddClientDialog(
+                    onDismiss = { showAddDialog = false },
+                    onSave = { name, channel ->
+                        viewModel.createClient(name, channel)
+                        showAddDialog = false
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(context.getString(R.string.clients_created_snackbar))
+                        }
+                    }
+                )
+            }
+
+            if (showEditDialog != null) {
+                val detail = clientDetail
+                if (detail?.client != null) {
+                    EditClientDialog(
+                        currentName = detail.client.name,
+                        currentChannel = detail.client.contactChannel,
+                        onDismiss = { showEditDialog = null },
+                        onSave = { newName, newChannel ->
+                            viewModel.updateClient(showEditDialog!!, newName, newChannel)
+                            showEditDialog = null
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(context.getString(R.string.clients_edit_saved))
+                            }
+                        }
+                    )
                 }
-            )
+            }
         }
     }
 }
@@ -108,6 +149,12 @@ fun ClientListContent(
     onClientClick: (Client) -> Unit,
     onAddClientClick: () -> Unit
 ) {
+    var searchQuery by remember { mutableStateOf("") }
+    val filteredClients = remember(clients, searchQuery) {
+        if (searchQuery.isBlank()) clients
+        else clients.filter { it.client.name.contains(searchQuery, ignoreCase = true) }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -173,17 +220,56 @@ fun ClientListContent(
                 }
             }
         } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(clients, key = { it.client.id }) { item ->
-                    ClientRowCard(item = item, onClick = { onClientClick(item.client) })
+            Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+                // Search bar
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = { Text(stringResource(R.string.clients_search_placeholder)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .testTag("client_search_field"),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MoneyGreen,
+                        focusedLabelColor = MoneyGreen
+                    ),
+                    singleLine = true,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                )
+
+                if (filteredClients.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No clients matching \"$searchQuery\"",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(filteredClients, key = { it.client.id }) { item ->
+                            ClientRowCard(item = item, onClick = { onClientClick(item.client) })
+                        }
+                        item { Spacer(modifier = Modifier.height(24.dp)) }
+                    }
                 }
-                item { Spacer(modifier = Modifier.height(24.dp)) }
             }
         }
     }
@@ -282,6 +368,7 @@ fun ClientRowCard(item: ClientListItem, onClick: () -> Unit) {
 fun ClientDetailContent(
     state: ClientDetailState,
     onBack: () -> Unit,
+    onEditClient: () -> Unit = {},
     onDeleteClient: () -> Unit,
     onAddTimelineEntry: (String) -> Unit,
     onDeleteTimelineEntry: (String) -> Unit
@@ -300,6 +387,9 @@ fun ClientDetailContent(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
                 actions = {
+                    IconButton(onClick = onEditClient) {
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = stringResource(R.string.clients_edit_title), tint = MoneyGreen)
+                    }
                     IconButton(onClick = { showDeleteConfirm = true }) {
                         Icon(imageVector = Icons.Default.Delete, contentDescription = stringResource(R.string.cd_clients_delete_client), tint = WarningRed)
                     }
@@ -491,6 +581,90 @@ fun TimelineEntryRow(entry: TimelineEntry, onDelete: () -> Unit) {
             }
         }
     }
+}
+
+@Composable
+fun EditClientDialog(
+    currentName: String,
+    currentChannel: String,
+    onDismiss: () -> Unit,
+    onSave: (String, ContactChannel) -> Unit
+) {
+    var name by remember { mutableStateOf(currentName) }
+    var selectedChannel by remember {
+        mutableStateOf(
+            runCatching { ContactChannel.valueOf(currentChannel) }.getOrDefault(ContactChannel.Other)
+        )
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(stringResource(R.string.clients_edit_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(stringResource(R.string.clients_create_name_label)) },
+                    modifier = Modifier.fillMaxWidth().testTag("edit_client_name_input"),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MoneyGreen,
+                        focusedLabelColor = MoneyGreen
+                    ),
+                    singleLine = true
+                )
+
+                Column {
+                    Text(
+                        stringResource(R.string.clients_create_channel_label),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ContactChannel.values().forEach { channel ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth().clickable { selectedChannel = channel }.padding(vertical = 6.dp)
+                        ) {
+                            RadioButton(
+                                selected = (selectedChannel == channel),
+                                onClick = { selectedChannel = channel },
+                                colors = RadioButtonDefaults.colors(selectedColor = MoneyGreen)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(channel.name, style = MaterialTheme.typography.bodyLarge)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (name.isNotBlank()) {
+                        onSave(name.trim(), selectedChannel)
+                    }
+                },
+                enabled = name.isNotBlank(),
+                colors = ButtonDefaults.buttonColors(containerColor = MoneyGreen, contentColor = Color.Black),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.testTag("save_edit_client_button")
+            ) {
+                Text(stringResource(R.string.clients_edit_button), fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss, modifier = Modifier.testTag("dismiss_edit_client_button")) {
+                Text(stringResource(R.string.clients_create_cancel), color = MaterialTheme.colorScheme.onSurface)
+            }
+        }
+    )
 }
 
 @Composable

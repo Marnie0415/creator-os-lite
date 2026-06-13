@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Warning
@@ -15,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -29,21 +31,30 @@ import com.example.ai.AiServiceManager
 import com.example.ai.AnthropicService
 import com.example.ai.GeminiApiClient
 import com.example.ai.OpenAiService
+import com.example.client.ClientRepository
+import com.example.data.DataExporter
+import com.example.invoice.InvoiceRepository
+import com.example.project.ProjectRepository
 import com.example.ui.SettingsManager
 import com.example.ui.theme.MoneyGreen
 import com.example.ui.theme.WarningRed
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     settingsManager: SettingsManager,
     onResetDatabase: () -> Unit,
+    clientRepository: ClientRepository? = null,
+    projectRepository: ProjectRepository? = null,
+    invoiceRepository: InvoiceRepository? = null,
     modifier: Modifier = Modifier
 ) {
     val currentProviderType by settingsManager.providerType.collectAsState()
     val currentProviderApiKey by settingsManager.providerApiKey.collectAsState()
     val currentProviderModel by settingsManager.providerModel.collectAsState()
     val currentProviderBaseUrl by settingsManager.providerBaseUrl.collectAsState()
+    val currentIsDarkMode by settingsManager.isDarkMode.collectAsState()
 
     var showResetDialog by remember { mutableStateOf(false) }
 
@@ -57,6 +68,19 @@ fun SettingsScreen(
     var showProviderDropdown by remember { mutableStateOf(false) }
     var showModelDropdown by remember { mutableStateOf(false) }
     var showProviderBaseUrlDropdown by remember { mutableStateOf(false) }
+    var isExporting by remember { mutableStateOf(false) }
+    var exportSnackbarMessage by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Show snackbar when export status changes
+    LaunchedEffect(exportSnackbarMessage) {
+        exportSnackbarMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            exportSnackbarMessage = null
+        }
+    }
 
     val modelSuggestions = when (selectedProviderType) {
         AiProviderType.OPENAI_COMPATIBLE -> OpenAiService.POPULAR_MODELS
@@ -68,17 +92,23 @@ fun SettingsScreen(
         )
     }
 
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(
-            modifier = Modifier
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
+        Surface(
+            modifier = modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(innerPadding),
+            color = MaterialTheme.colorScheme.background
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
             // Header
             Column(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)) {
                 Text(
@@ -94,6 +124,39 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.displayMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
+            }
+
+            // ---- Theme Toggle Card ----
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.settings_theme_title),
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MoneyGreen
+                        )
+                        Text(
+                            text = stringResource(R.string.settings_theme_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                    Switch(
+                        checked = currentIsDarkMode,
+                        onCheckedChange = { settingsManager.setDarkMode(it) },
+                        colors = SwitchDefaults.colors(checkedTrackColor = MoneyGreen)
+                    )
+                }
             }
 
             // ---- Provider Selection Card ----
@@ -422,6 +485,91 @@ fun SettingsScreen(
                 }
             }
 
+            // Data Export Card
+            if (clientRepository != null && projectRepository != null && invoiceRepository != null) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = null,
+                                tint = MoneyGreen,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.export_title),
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MoneyGreen
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(R.string.export_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.secondary,
+                            lineHeight = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Button(
+                            onClick = {
+                                isExporting = true
+                                coroutineScope.launch {
+                                    try {
+                                        val clients = kotlinx.coroutines.flow.first(clientRepository.allClients)
+                                        val timelineEntries = kotlinx.coroutines.flow.first(clientRepository.allTimelineEntries)
+                                        val projects = kotlinx.coroutines.flow.first(projectRepository.allProjects)
+                                        val invoices = kotlinx.coroutines.flow.first(invoiceRepository.allInvoices)
+                                        val exportDir = DataExporter.exportAll(context, clients, timelineEntries, projects, invoices)
+                                        DataExporter.shareExport(context, exportDir)
+                                        exportSnackbarMessage = context.getString(R.string.export_success)
+                                    } catch (e: Exception) {
+                                        exportSnackbarMessage = context.getString(R.string.export_error)
+                                    } finally {
+                                        isExporting = false
+                                    }
+                                }
+                            },
+                            enabled = !isExporting,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MoneyGreen,
+                                contentColor = Color.Black
+                            ),
+                            shape = RoundedCornerShape(4.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("export_data_button")
+                        ) {
+                            if (isExporting) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    color = Color.Black,
+                                    strokeWidth = 2.dp
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.Share,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                            }
+                            Text(
+                                stringResource(R.string.export_button),
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.weight(1f))
 
             // Danger Zone
@@ -470,6 +618,7 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
         }
+    }
     }
 
     if (showResetDialog) {

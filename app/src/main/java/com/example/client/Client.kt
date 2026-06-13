@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 enum class ContactChannel {
-    Discord, Telegram, Email, WhatsApp, Other
+    Discord, Telegram, Email, WhatsApp, WeChat, Other
 }
 
 @Entity(tableName = "clients")

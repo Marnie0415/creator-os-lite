@@ -1,14 +1,14 @@
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.compose)
-  alias(libs.plugins.google.devtools.ksp)
+  alias(libs.plugins.kotlin.kapt)
   alias(libs.plugins.roborazzi)
   alias(libs.plugins.secrets)
 }
 
 android {
   namespace = "com.example"
-  compileSdk { version = release(36) { minorApiLevel = 1 } }
+  compileSdk = 36
 
   defaultConfig {
     applicationId = "com.creatoros.lite"
@@ -87,6 +87,6 @@ dependencies {
   androidTestImplementation(libs.androidx.runner)
   debugImplementation(libs.androidx.compose.ui.test.manifest)
   debugImplementation(libs.androidx.compose.ui.tooling)
-  "ksp"(libs.androidx.room.compiler)
-  "ksp"(libs.moshi.kotlin.codegen)
+  kapt(libs.androidx.room.compiler)
+  kapt(libs.moshi.kotlin.codegen)
 }

@@ -7,6 +7,9 @@ import com.example.R
 import com.example.ui.SettingsManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 private const val MAX_INPUT_LENGTH = 5000
@@ -22,6 +25,10 @@ class AiViewModel(
     application: Application,
     private val settingsManager: SettingsManager
 ) : AndroidViewModel(application) {
+
+    /** Whether any API key has been configured. */
+    val hasAnyKeyConfigured: StateFlow<Boolean> = settingsManager.providerApiKey.map { it.isNotBlank() }
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), false)
 
     init {
         val savedKey = settingsManager.apiKey.value

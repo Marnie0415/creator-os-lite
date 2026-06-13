@@ -40,8 +40,10 @@ class DashboardViewModel(
         // 2. Count Clients Pending Reply (= Ghosted Clients count)
         val clientsPendingReplyCount = risks.count { it is RiskItem.GhostedClient || it is RiskItem.CriticalClient }
 
-        // 3. Count Pending Balance Invoices (= Invoices where status != FullyPaid)
-        val pendingBalanceInvoicesCount = invoices.count { it.status != InvoiceStatus.FullyPaid.name }
+        // 3. Count Pending Balance Invoices (= Unpaid or PendingBalance)
+        val pendingBalanceInvoicesCount = invoices.count {
+            it.status == InvoiceStatus.Unpaid.name || it.status == InvoiceStatus.PendingBalance.name
+        }
 
         // 4. Count Expiring Projects (= Projects due within 72 hours and not Completed)
         // Let's filter projects that are due within 72 hours and not completed

@@ -28,10 +28,12 @@ import com.example.ui.theme.WarningRed
 fun AiScreen(
     viewModel: AiViewModel,
     ghostedOrOverdueClients: List<Pair<String, Pair<Double, String>>>,
+    onNavigateToSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val followUpState by viewModel.followUpState.collectAsState()
     val quoteState by viewModel.quoteState.collectAsState()
+    val hasKey by viewModel.hasAnyKeyConfigured.collectAsState()
 
     val clipboardManager = LocalClipboardManager.current
     var activeTab by remember { mutableStateOf(0) }
@@ -60,6 +62,37 @@ fun AiScreen(
                     style = MaterialTheme.typography.displayMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
+            }
+
+            // API Key warning banner
+            if (!hasKey) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .clickable(onClick = onNavigateToSettings),
+                    border = BorderStroke(1.dp, WarningRed),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = null,
+                            tint = WarningRed,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.error_api_key_missing),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = WarningRed,
+                            lineHeight = 16.sp
+                        )
+                    }
+                }
             }
 
             TabRow(
