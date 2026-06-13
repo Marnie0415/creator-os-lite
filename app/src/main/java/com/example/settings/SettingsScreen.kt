@@ -86,7 +86,8 @@ fun SettingsScreen(
     var pendingTimelinesUri by remember { mutableStateOf<Uri?>(null) }
     var pendingProjectsUri by remember { mutableStateOf<Uri?>(null) }
     var pendingInvoicesUri by remember { mutableStateOf<Uri?>(null) }
-    var importStepLabel by remember { mutableStateOf(stringResource(R.string.import_button)) }
+    val importButtonLabel = stringResource(R.string.import_button)
+    var importStepLabel by remember { mutableStateOf(importButtonLabel) }
 
     val importLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -97,7 +98,7 @@ fun SettingsScreen(
             pendingTimelinesUri = null
             pendingProjectsUri = null
             pendingInvoicesUri = null
-            importStepLabel = stringResource(R.string.import_button)
+            importStepLabel = importButtonLabel
             return@rememberLauncherForActivityResult
         }
         when (importStep.value) {
@@ -145,7 +146,7 @@ fun SettingsScreen(
                         pendingTimelinesUri = null
                         pendingProjectsUri = null
                         pendingInvoicesUri = null
-                        importStepLabel = stringResource(R.string.import_button)
+                        importStepLabel = importButtonLabel
                     }
                 }
             }
